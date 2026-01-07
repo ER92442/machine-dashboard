@@ -1,0 +1,3 @@
+window.APP_CONFIG = {
+  APP_TITLE: "$APP_TITLE"
+}

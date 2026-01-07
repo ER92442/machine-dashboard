@@ -1,73 +1,72 @@
-# React + TypeScript + Vite
+# Machine Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A small React + Vite frontend for viewing machines.
 
-Currently, two official plugins are available:
+## Run locally (development)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Requirements: Node 16+ and npm or yarn.
 
-## React Compiler
+Install dependencies and start dev server:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Open in browser: http://localhost:5173
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Build (production)
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Build the static site:
+
+```bash
+npm run build
 ```
+
+Preview the production build locally (Vite):
+
+```bash
+npm run preview
+```
+
+Or build a Docker image and serve with Nginx:
+
+```bash
+docker build -t your-registry/machine-dashboard:latest .
+docker push your-registry/machine-dashboard:latest
+```
+
+## Deploy to Kubernetes
+
+1. Build and push the Docker image (see above).
+2. Update `k8s/deployment.yaml` to use your image (replace `YOUR_IMAGE_HERE:latest`).
+3. Apply the manifests:
+
+```bash
+kubectl apply -f k8s/
+```
+
+To update only the image on an existing deployment:
+
+```bash
+kubectl set image deployment/<deployment-name> <container-name>=your-registry/machine-dashboard:latest
+```
+
+Access the app in the cluster:
+
+- Dev: http://localhost:5173
+- Kubernetes (example NodePort): http://<node-ip>:30080 (replace `<node-ip>` with a node IP or use an Ingress)
+
+## Assumptions and shortcuts taken
+
+- Frontend is static; runtime config is injected via an entrypoint that writes `config.js` (see `k8s/` notes).
+- Example Kubernetes manifests use a NodePort for simplicity (not production-ready).
+- No CI/CD or automated image build pipeline included.
+- Minimal security, logging, and observability configuration.
+
+## What I'd improve or add with more time
+
+- Add CI pipeline to build, test, and publish Docker images automatically.
+- Create a proper Ingress with TLS and a DNS record (replace NodePort).
+- Add health/readiness probes and better resource/replica settings for k8s.
+- Improve accessibility, i18n, and error handling in the UI.

@@ -19,6 +19,7 @@ function App(): React.ReactElement {
   const [showForm, setShowForm] = useState(false);
 
   const [deleted, setDeleted] = useState<DeletedRecord>(null);
+  const [appTitle, setAppTitle] = useState('Machine Dashboard not from config');
 
   useEffect(() => {
     // ensure seeding only if localStorage empty
@@ -26,6 +27,11 @@ function App(): React.ReactElement {
       setMachines(SAMPLE_MACHINES);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const cfg = (window as any).APP_CONFIG;
+    if (cfg?.APP_TITLE) setAppTitle(cfg.APP_TITLE);
   }, []);
 
   function handleAdd() {
@@ -88,7 +94,7 @@ function App(): React.ReactElement {
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-5xl mx-auto">
         <header className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">Machine Dashboard</h1>
+          <h1 className="text-2xl font-bold">{appTitle}</h1>
           <div className="flex gap-2">
             <button onClick={handleAdd} className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded">Add Machine</button>
           </div>
